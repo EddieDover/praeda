@@ -7,7 +7,7 @@ This library provides a flexible system for randomly generating items with affix
 Add to your `Cargo.toml`:
 ```toml
 [dependencies]
-praeda = { path = "../path/to/praeda" }
+praeda = { git = "https://www.github.com/EddieDover/praeda.git", branch = "master" }
 ```
 
 Build and test:
