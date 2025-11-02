@@ -1,0 +1,319 @@
+# Praeda Loot Generator Configuration
+# Original converted from C++ library test_data.json
+
+# Quality tiers with their weight (frequency)
+[quality_data]
+common = 100
+uncommon = 60
+rare = 30
+epic = 9
+legendary = 1
+
+# Item types and their subtypes
+[[item_types]]
+item_type = "weapon"
+weight = 1
+[item_types.subtypes]
+one-handed = 1
+two-handed = 1
+
+[[item_types]]
+item_type = "armor"
+weight = 1
+[item_types.subtypes]
+chest = 1
+feet = 1
+hands = 1
+head = 1
+legs = 1
+shoulders = 1
+waist = 1
+wrists = 1
+
+# Global attributes (apply to items without specific type/subtype)
+[[item_attributes]]
+item_type = ""
+subtype = ""
+
+[[item_attributes.attributes]]
+name = "strength_requirement"
+initial_value = 0.0
+min = 0.0
+max = 100.0
+required = false
+
+[[item_attributes.attributes]]
+name = "dexterity_requirement"
+initial_value = 0.0
+min = 0.0
+max = 100.0
+required = false
+
+[[item_attributes.attributes]]
+name = "intelligence_requirement"
+initial_value = 0.0
+min = 0.0
+max = 100.0
+required = false
+
+# Weapon-specific attributes
+[[item_attributes]]
+item_type = "weapon"
+subtype = ""
+
+[[item_attributes.attributes]]
+name = "level_requirement"
+initial_value = 0.0
+min = 0.0
+max = 100.0
+required = false
+
+[[item_attributes.attributes]]
+name = "durability"
+initial_value = 16.0
+min = 1.0
+max = 16.0
+required = true
+
+[[item_attributes.attributes]]
+name = "attack_damage"
+initial_value = 1.0
+min = 1.0
+max = 5.0
+required = true
+
+[[item_attributes.attributes]]
+name = "attack_speed"
+initial_value = 0.0
+min = 0.0
+max = 100.0
+required = true
+
+[[item_attributes.attributes]]
+name = "critical_chance"
+initial_value = 0.0
+min = 0.0
+max = 100.0
+required = false
+
+[[item_attributes.attributes]]
+name = "critical_damage"
+initial_value = 0.0
+min = 0.0
+max = 100.0
+required = false
+
+# Item names by type and subtype
+[[item_list]]
+item_type = "armor"
+subtype = "chest"
+names = ["chestplate", "tunic"]
+
+[[item_list]]
+item_type = "armor"
+subtype = "feet"
+names = ["boots", "shoes"]
+
+[[item_list]]
+item_type = "armor"
+subtype = "hands"
+names = ["gauntlets", "gloves"]
+
+[[item_list]]
+item_type = "armor"
+subtype = "head"
+names = ["helm", "hood"]
+
+[[item_list]]
+item_type = "armor"
+subtype = "legs"
+names = ["legplates", "leggings"]
+
+[[item_list]]
+item_type = "armor"
+subtype = "shoulders"
+names = ["shoulderplates", "pauldrons"]
+
+[[item_list]]
+item_type = "armor"
+subtype = "waist"
+names = ["belt", "girdle"]
+
+[[item_list]]
+item_type = "armor"
+subtype = "wrists"
+names = ["bracers", "vambraces"]
+
+[[item_list]]
+item_type = "weapon"
+subtype = "one-handed"
+names = ["sword", "axe", "mace", "dagger"]
+
+[[item_list]]
+item_type = "weapon"
+subtype = "two-handed"
+names = ["sword", "axe", "mace", "staff"]
+
+# Affixes (prefixes and suffixes) by type and subtype
+[[item_affixes]]
+item_type = "armor"
+subtype = ""
+
+# Armor prefixes
+[[item_affixes.prefixes]]
+name = "heavy"
+[[item_affixes.prefixes.attributes]]
+name = "durability"
+initial_value = 10.0
+max = 0.0
+min = 0.0
+required = false
+
+[[item_affixes.prefixes]]
+name = "light"
+[[item_affixes.prefixes.attributes]]
+name = "durability"
+initial_value = -10.0
+max = 0.0
+min = 0.0
+required = false
+[[item_affixes.prefixes.attributes]]
+name = "strength_requirement"
+initial_value = -10.0
+max = 0.0
+min = 0.0
+required = false
+
+[[item_affixes.prefixes]]
+name = "strong"
+[[item_affixes.prefixes.attributes]]
+name = "strength_requirement"
+initial_value = 10.0
+max = 0.0
+min = 0.0
+required = false
+
+# Armor suffixes
+[[item_affixes.suffixes]]
+name = "of the bear"
+[[item_affixes.suffixes.attributes]]
+name = "strength_requirement"
+initial_value = 10.0
+max = 0.0
+min = 0.0
+required = false
+
+[[item_affixes.suffixes]]
+name = "of the eagle"
+[[item_affixes.suffixes.attributes]]
+name = "intelligence_requirement"
+initial_value = 10.0
+max = 0.0
+min = 0.0
+required = false
+
+[[item_affixes.suffixes]]
+name = "of the wolf"
+[[item_affixes.suffixes.attributes]]
+name = "dexterity_requirement"
+initial_value = 10.0
+max = 0.0
+min = 0.0
+required = false
+
+[[item_affixes.suffixes]]
+name = "of the lion"
+[[item_affixes.suffixes.attributes]]
+name = "strength_requirement"
+initial_value = 5.0
+max = 0.0
+min = 0.0
+required = false
+
+# Weapon affixes
+[[item_affixes]]
+item_type = "weapon"
+subtype = ""
+
+# Weapon prefixes
+[[item_affixes.prefixes]]
+name = "sharp"
+[[item_affixes.prefixes.attributes]]
+name = "attack_damage"
+initial_value = 10.0
+max = 0.0
+min = 0.0
+required = false
+
+[[item_affixes.prefixes]]
+name = "dull"
+[[item_affixes.prefixes.attributes]]
+name = "attack_damage"
+initial_value = -10.0
+max = 0.0
+min = 0.0
+required = false
+
+[[item_affixes.prefixes]]
+name = "heavy"
+[[item_affixes.prefixes.attributes]]
+name = "attack_speed"
+initial_value = -10.0
+max = 0.0
+min = 0.0
+required = false
+
+[[item_affixes.prefixes]]
+name = "light"
+[[item_affixes.prefixes.attributes]]
+name = "attack_speed"
+initial_value = 10.0
+max = 0.0
+min = 0.0
+required = false
+
+[[item_affixes.prefixes]]
+name = "strong"
+[[item_affixes.prefixes.attributes]]
+name = "strength_requirement"
+initial_value = 10.0
+max = 0.0
+min = 0.0
+required = false
+
+# Weapon suffixes
+[[item_affixes.suffixes]]
+name = "of the bear"
+[[item_affixes.suffixes.attributes]]
+name = "strength_requirement"
+initial_value = 10.0
+max = 0.0
+min = 0.0
+required = false
+
+[[item_affixes.suffixes]]
+name = "of the eagle"
+[[item_affixes.suffixes.attributes]]
+name = "intelligence_requirement"
+initial_value = 10.0
+max = 0.0
+min = 0.0
+required = false
+
+[[item_affixes.suffixes]]
+name = "of the wolf"
+[[item_affixes.suffixes.attributes]]
+name = "dexterity_requirement"
+initial_value = 10.0
+max = 0.0
+min = 0.0
+required = false
+
+[[item_affixes.suffixes]]
+name = "of the lion"
+[[item_affixes.suffixes.attributes]]
+name = "strength_requirement"
+initial_value = 5.0
+max = 0.0
+min = 0.0
+required = false
