@@ -21,13 +21,11 @@ cargo test
 
 ## Features
 
-- ✅ **Weighted Random Selection** - Quality tiers, item types, subtypes, affixes
-- ✅ **Attribute System** - Attributes scale with item level (linear/exponential)
-- ✅ **Affix System** - Prefixes and suffixes with configurable attributes
-- ✅ **TOML Configuration** - Human-readable TOML input files (easy to edit manually)
-- ✅ **JSON Output** - Generated items serialize to clean JSON
-- ✅ **Error Handling** - Proper Result<T> error types
-- ✅ **Thread-Safe** - Uses rand::thread_rng() for safety
+- **Weighted Random Selection** - Quality tiers, item types, subtypes, affixes
+- **Attribute System** - Attributes scale with item level (linear/exponential)
+- **Affix System** - Prefixes and suffixes with configurable attributes
+- **TOML Configuration** - Human-readable TOML input files (easy to edit manually)
+- **JSON Output** - Generated items serialize to clean JSON
 
 ## Usage Examples
 
