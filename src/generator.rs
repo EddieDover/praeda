@@ -108,6 +108,31 @@ impl PraedaGenerator {
         }
     }
 
+    /// Get all subtypes for a specific item type
+    pub fn get_subtypes_for_type(&self, item_type: &str) -> Vec<String> {
+        if let Some(type_obj) = self.get_item_type(item_type) {
+            type_obj.get_subtypes().keys().cloned().collect()
+        } else {
+            Vec::new()
+        }
+    }
+
+    /// Get all weapon subtypes (convenience method for "Weapon" type)
+    pub fn get_weapon_subtypes(&self) -> Vec<String> {
+        self.get_subtypes_for_type("Weapon")
+    }
+
+    /// Get item names for a specific type and subtype
+    pub fn get_item_names(&self, item_type: &str, subtype: &str) -> Vec<String> {
+        let key = (item_type.to_string(), subtype.to_string());
+        self.item_list.get(&key).cloned().unwrap_or_default()
+    }
+
+    /// Get all item types as a list of strings
+    pub fn get_item_type_names(&self) -> Vec<String> {
+        self.item_types.iter().map(|it| it.item_type.clone()).collect()
+    }
+
     /// Set item attribute
     pub fn set_attribute(
         &mut self,
