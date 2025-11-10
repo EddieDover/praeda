@@ -1821,3 +1821,191 @@ fn test_get_suffixes_missing() {
     assert_eq!(suffixes.len(), 0);
 }
 
+#[test]
+fn test_subtype_metadata_set_and_get() {
+    let mut gen = PraedaGenerator::new();
+
+    gen.set_subtype_metadata(
+        "weapon".to_string(),
+        "one-handed".to_string(),
+        "is_two_handed".to_string(),
+        serde_json::json!(false),
+    );
+
+    let metadata = gen.get_subtype_metadata("weapon", "one-handed", "is_two_handed");
+    assert!(metadata.is_some());
+    assert_eq!(metadata.unwrap(), &serde_json::json!(false));
+}
+
+#[test]
+fn test_get_all_subtype_metadata() {
+    let mut gen = PraedaGenerator::new();
+
+    gen.set_subtype_metadata(
+        "weapon".to_string(),
+        "two-handed".to_string(),
+        "is_two_handed".to_string(),
+        serde_json::json!(true),
+    );
+    gen.set_subtype_metadata(
+        "weapon".to_string(),
+        "two-handed".to_string(),
+        "weight".to_string(),
+        serde_json::json!(15),
+    );
+
+    let all_metadata = gen.get_all_subtype_metadata("weapon", "two-handed");
+    assert!(all_metadata.is_some());
+
+    let metadata = all_metadata.unwrap();
+    assert_eq!(metadata.len(), 2);
+    assert_eq!(metadata.get("is_two_handed").unwrap(), &serde_json::json!(true));
+    assert_eq!(metadata.get("weight").unwrap(), &serde_json::json!(15));
+}
+
+#[test]
+fn test_item_metadata_set_and_get() {
+    let mut item = Item::new(
+        "test_sword".to_string(),
+        "common".to_string(),
+        "weapon".to_string(),
+        "one-handed".to_string(),
+        Affix::empty(),
+        Affix::empty(),
+        HashMap::new(),
+    );
+
+    item.set_metadata("is_magical".to_string(), serde_json::json!(true));
+
+    assert!(item.has_metadata("is_magical"));
+    assert_eq!(item.get_metadata("is_magical"), Some(&serde_json::json!(true)));
+}
+
+#[test]
+fn test_item_metadata_get_all() {
+    let mut item = Item::new(
+        "test_axe".to_string(),
+        "rare".to_string(),
+        "weapon".to_string(),
+        "two-handed".to_string(),
+        Affix::empty(),
+        Affix::empty(),
+        HashMap::new(),
+    );
+
+    item.set_metadata("is_two_handed".to_string(), serde_json::json!(true));
+    item.set_metadata("weight".to_string(), serde_json::json!(20));
+
+    let all_metadata = item.get_all_metadata();
+    assert_eq!(all_metadata.len(), 2);
+    assert_eq!(all_metadata.get("is_two_handed").unwrap(), &serde_json::json!(true));
+    assert_eq!(all_metadata.get("weight").unwrap(), &serde_json::json!(20));
+}
+
+#[test]
+fn test_generated_item_contains_subtype_metadata() {
+    let mut gen = PraedaGenerator::new();
+
+    // Setup quality data
+    gen.set_quality_data("common".to_string(), 100);
+
+    // Setup item type and subtype
+    gen.set_item_type("weapon".to_string(), 1);
+    gen.set_item_subtype("weapon".to_string(), "sword".to_string(), 1);
+
+    // Set metadata for the subtype
+    gen.set_subtype_metadata(
+        "weapon".to_string(),
+        "sword".to_string(),
+        "is_magical".to_string(),
+        serde_json::json!(false),
+    );
+
+    // Setup attributes
+    gen.set_attribute(
+        "weapon".to_string(),
+        "".to_string(),
+        "damage".to_string(),
+        10.0,
+        1.0,
+        20.0,
+        true,
+    );
+
+    // Setup item names
+    gen.set_item(
+        "weapon".to_string(),
+        "sword".to_string(),
+        vec!["longsword".to_string()],
+    );
+
+    // Generate item
+    let options = GeneratorOptions {
+        number_of_items: 1,
+        base_level: 5.0,
+        level_variance: 2.0,
+        affix_chance: 0.0,
+        linear: true,
+        scaling_factor: 1.0,
+    };
+
+    let items = gen
+        .generate_loot(&options, &GeneratorOverrides::empty(), "test")
+        .unwrap();
+
+    assert_eq!(items.len(), 1);
+    let item = &items[0];
+
+    // Verify the metadata was attached to the generated item
+    assert!(item.has_metadata("is_magical"));
+    assert_eq!(item.get_metadata("is_magical"), Some(&serde_json::json!(false)));
+}
+
+#[test]
+fn test_load_metadata_from_toml() {
+    let toml_str = r#"
+[quality_data]
+common = 100
+
+[[item_types]]
+item_type = "weapon"
+weight = 1
+[item_types.subtypes]
+sword = 1
+
+[[item_attributes]]
+item_type = "weapon"
+subtype = ""
+[[item_attributes.attributes]]
+name = "damage"
+initial_value = 10.0
+min = 1.0
+max = 20.0
+required = true
+
+[[item_list]]
+item_type = "weapon"
+subtype = "sword"
+names = ["longsword"]
+
+[[item_affixes]]
+item_type = "weapon"
+subtype = "sword"
+[item_affixes.metadata]
+is_legendary = true
+rarity_multiplier = 1.5
+    "#;
+
+    let mut gen = PraedaGenerator::new();
+    gen.load_data_toml(toml_str).unwrap();
+
+    // Verify metadata was loaded
+    let metadata = gen.get_subtype_metadata("weapon", "sword", "is_legendary");
+    assert!(metadata.is_some());
+    assert_eq!(metadata.unwrap(), &serde_json::json!(true));
+
+    let multiplier = gen.get_subtype_metadata("weapon", "sword", "rarity_multiplier");
+    assert!(multiplier.is_some());
+    assert_eq!(multiplier.unwrap(), &serde_json::json!(1.5));
+}
+

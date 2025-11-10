@@ -12,6 +12,7 @@ pub struct PraedaGenerator {
     item_list: HashMap<(String, String), Vec<String>>,
     item_attributes: HashMap<(String, String), Vec<ItemAttribute>>,
     item_affixes: HashMap<(String, String), (Vec<Affix>, Vec<Affix>)>,
+    subtype_metadata: HashMap<(String, String), HashMap<String, serde_json::Value>>,
     loot_list: HashMap<String, Vec<Item>>,
 }
 
@@ -23,6 +24,7 @@ impl PraedaGenerator {
             item_list: HashMap::new(),
             item_attributes: HashMap::new(),
             item_affixes: HashMap::new(),
+            subtype_metadata: HashMap::new(),
             loot_list: HashMap::new(),
         }
     }
@@ -131,6 +133,42 @@ impl PraedaGenerator {
     /// Get all item types as a list of strings
     pub fn get_item_type_names(&self) -> Vec<String> {
         self.item_types.iter().map(|it| it.item_type.clone()).collect()
+    }
+
+    /// Set metadata for a specific subtype
+    pub fn set_subtype_metadata(
+        &mut self,
+        item_type: String,
+        subtype: String,
+        key: String,
+        value: serde_json::Value,
+    ) {
+        let type_key = (item_type, subtype);
+        self.subtype_metadata
+            .entry(type_key)
+            .or_insert_with(HashMap::new)
+            .insert(key, value);
+    }
+
+    /// Get metadata for a specific subtype
+    pub fn get_subtype_metadata(
+        &self,
+        item_type: &str,
+        subtype: &str,
+        key: &str,
+    ) -> Option<&serde_json::Value> {
+        let type_key = (item_type.to_string(), subtype.to_string());
+        self.subtype_metadata.get(&type_key).and_then(|m| m.get(key))
+    }
+
+    /// Get all metadata for a specific subtype
+    pub fn get_all_subtype_metadata(
+        &self,
+        item_type: &str,
+        subtype: &str,
+    ) -> Option<&HashMap<String, serde_json::Value>> {
+        let type_key = (item_type.to_string(), subtype.to_string());
+        self.subtype_metadata.get(&type_key)
     }
 
     /// Set item attribute
@@ -318,8 +356,13 @@ impl PraedaGenerator {
 
         // Load item affixes from TOML structure into HashMap
         for affixes in config.item_affixes {
-            let key = (affixes.item_type, affixes.subtype);
-            self.item_affixes.insert(key, (affixes.prefixes, affixes.suffixes));
+            let key = (affixes.item_type.clone(), affixes.subtype.clone());
+            self.item_affixes.insert(key.clone(), (affixes.prefixes, affixes.suffixes));
+
+            // Store metadata if present
+            if !affixes.metadata.is_empty() {
+                self.subtype_metadata.insert(key, affixes.metadata);
+            }
         }
 
         Ok(())
@@ -465,14 +508,22 @@ impl PraedaGenerator {
         let mut item = Item::new(
             item_name,
             item_quality,
-            item_type,
-            subtype,
+            item_type.clone(),
+            subtype.clone(),
             prefix,
             suffix,
             HashMap::new(),
         );
 
         self.calculate_attributes(&mut item, options, &mut rng)?;
+
+        // Attach subtype metadata to the item
+        if let Some(metadata) = self.get_all_subtype_metadata(&item_type, &subtype) {
+            for (key, value) in metadata {
+                item.set_metadata(key.clone(), value.clone());
+            }
+        }
+
         Ok(item)
     }
 

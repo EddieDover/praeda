@@ -7,6 +7,8 @@ pub struct ItemType {
     pub item_type: String,
     pub subtypes: HashMap<String, i32>,
     pub weight: i32,
+    #[serde(default)]
+    pub metadata: HashMap<String, serde_json::Value>,
 }
 
 impl ItemType {
@@ -15,6 +17,7 @@ impl ItemType {
             item_type,
             subtypes,
             weight,
+            metadata: HashMap::new(),
         }
     }
 
@@ -44,6 +47,22 @@ impl ItemType {
 
     pub fn get_weight(&self) -> i32 {
         self.weight
+    }
+
+    pub fn set_metadata(&mut self, key: String, value: serde_json::Value) {
+        self.metadata.insert(key, value);
+    }
+
+    pub fn get_metadata(&self, key: &str) -> Option<&serde_json::Value> {
+        self.metadata.get(key)
+    }
+
+    pub fn get_all_metadata(&self) -> &HashMap<String, serde_json::Value> {
+        &self.metadata
+    }
+
+    pub fn has_metadata(&self, key: &str) -> bool {
+        self.metadata.contains_key(key)
     }
 }
 
@@ -250,6 +269,8 @@ pub struct Item {
     pub prefix: Affix,
     pub suffix: Affix,
     pub attributes: HashMap<String, ItemAttribute>,
+    #[serde(default)]
+    pub metadata: HashMap<String, serde_json::Value>,
 }
 
 impl Item {
@@ -270,6 +291,7 @@ impl Item {
             prefix,
             suffix,
             attributes,
+            metadata: HashMap::new(),
         }
     }
 
@@ -282,6 +304,7 @@ impl Item {
             prefix: Affix::empty(),
             suffix: Affix::empty(),
             attributes: HashMap::new(),
+            metadata: HashMap::new(),
         }
     }
 
@@ -365,6 +388,22 @@ impl Item {
 
     pub fn get_attribute_mut(&mut self, name: &str) -> Option<&mut ItemAttribute> {
         self.attributes.get_mut(name)
+    }
+
+    pub fn set_metadata(&mut self, key: String, value: serde_json::Value) {
+        self.metadata.insert(key, value);
+    }
+
+    pub fn get_metadata(&self, key: &str) -> Option<&serde_json::Value> {
+        self.metadata.get(key)
+    }
+
+    pub fn get_all_metadata(&self) -> &HashMap<String, serde_json::Value> {
+        &self.metadata
+    }
+
+    pub fn has_metadata(&self, key: &str) -> bool {
+        self.metadata.contains_key(key)
     }
 }
 
@@ -509,4 +548,6 @@ pub struct TomlItemAffixes {
     pub prefixes: Vec<Affix>,
     #[serde(default)]
     pub suffixes: Vec<Affix>,
+    #[serde(default)]
+    pub metadata: HashMap<String, serde_json::Value>,
 }
