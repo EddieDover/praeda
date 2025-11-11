@@ -72,6 +72,9 @@ pub struct ItemData {
     pub item_type: String,
     pub subtype: String,
     pub names: Vec<String>,
+    /// Per-item metadata: maps item name to metadata properties
+    #[serde(default)]
+    pub item_metadata: HashMap<String, HashMap<String, serde_json::Value>>,
 }
 
 impl ItemData {
@@ -80,6 +83,7 @@ impl ItemData {
             item_type,
             subtype,
             names,
+            item_metadata: HashMap::new(),
         }
     }
 
@@ -105,6 +109,34 @@ impl ItemData {
 
     pub fn get_names(&self) -> &[String] {
         &self.names
+    }
+
+    /// Set metadata for a specific item name
+    pub fn set_item_metadata(&mut self, item_name: String, key: String, value: serde_json::Value) {
+        self.item_metadata
+            .entry(item_name)
+            .or_insert_with(HashMap::new)
+            .insert(key, value);
+    }
+
+    /// Get metadata for a specific item name and key
+    pub fn get_item_metadata(&self, item_name: &str, key: &str) -> Option<&serde_json::Value> {
+        self.item_metadata
+            .get(item_name)
+            .and_then(|metadata| metadata.get(key))
+    }
+
+    /// Get all metadata for a specific item name
+    pub fn get_item_all_metadata(&self, item_name: &str) -> Option<&HashMap<String, serde_json::Value>> {
+        self.item_metadata.get(item_name)
+    }
+
+    /// Check if an item has metadata
+    pub fn has_item_metadata(&self, item_name: &str, key: &str) -> bool {
+        self.item_metadata
+            .get(item_name)
+            .map(|m| m.contains_key(key))
+            .unwrap_or(false)
     }
 }
 
@@ -535,6 +567,8 @@ pub struct TomlItemList {
     pub subtype: String,
     #[serde(default)]
     pub names: Vec<String>,
+    #[serde(default)]
+    pub item_metadata: HashMap<String, HashMap<String, serde_json::Value>>,
 }
 
 /// Item affixes for a specific type/subtype combination
