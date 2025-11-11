@@ -115,7 +115,7 @@ impl ItemData {
     pub fn set_item_metadata(&mut self, item_name: String, key: String, value: serde_json::Value) {
         self.item_metadata
             .entry(item_name)
-            .or_insert_with(HashMap::new)
+            .or_default()
             .insert(key, value);
     }
 
@@ -469,7 +469,17 @@ impl GeneratorOptions {
         }
     }
 
-    pub fn default() -> Self {
+    pub fn is_linear(&self) -> bool {
+        self.linear
+    }
+
+    pub fn is_exponential(&self) -> bool {
+        !self.linear
+    }
+}
+
+impl Default for GeneratorOptions {
+    fn default() -> Self {
         GeneratorOptions {
             number_of_items: 1,
             base_level: 1.0,
@@ -478,14 +488,6 @@ impl GeneratorOptions {
             linear: true,
             scaling_factor: 1.0,
         }
-    }
-
-    pub fn is_linear(&self) -> bool {
-        self.linear
-    }
-
-    pub fn is_exponential(&self) -> bool {
-        !self.linear
     }
 }
 

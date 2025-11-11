@@ -25,21 +25,25 @@ fn create_test_generator() -> PraedaGenerator {
     gen.set_attribute(
         "weapon".to_string(),
         "".to_string(),
-        "damage".to_string(),
-        10.0,
-        1.0,
-        20.0,
-        true,
+        ItemAttribute::new(
+            "damage".to_string(),
+            10.0,
+            1.0,
+            20.0,
+            true,
+        ),
     );
 
     gen.set_attribute(
         "armor".to_string(),
         "".to_string(),
-        "defense".to_string(),
-        5.0,
-        1.0,
-        10.0,
-        true,
+        ItemAttribute::new(
+            "defense".to_string(),
+            5.0,
+            1.0,
+            10.0,
+            true,
+        ),
     );
 
     // Item names
@@ -66,11 +70,13 @@ fn create_test_generator() -> PraedaGenerator {
         "".to_string(),
         true,
         "sharp".to_string(),
-        "damage".to_string(),
-        5.0,
-        0.0,
-        0.0,
-        false,
+        ItemAttribute::new(
+            "damage".to_string(),
+            5.0,
+            0.0,
+            0.0,
+            false,
+        ),
     );
 
     gen.set_affix_attribute(
@@ -78,11 +84,13 @@ fn create_test_generator() -> PraedaGenerator {
         "".to_string(),
         false,
         "of fire".to_string(),
-        "damage".to_string(),
-        3.0,
-        0.0,
-        0.0,
-        false,
+        ItemAttribute::new(
+            "damage".to_string(),
+            3.0,
+            0.0,
+            0.0,
+            false,
+        ),
     );
 
     gen
@@ -509,11 +517,13 @@ fn test_quality_distribution() -> Result<()> {
     gen.set_attribute(
         "weapon".to_string(),
         "".to_string(),
-        "damage".to_string(),
-        10.0,
-        1.0,
-        20.0,
-        true,
+        ItemAttribute::new(
+            "damage".to_string(),
+            10.0,
+            1.0,
+            20.0,
+            true,
+        ),
     );
     gen.set_item(
         "weapon".to_string(),
@@ -555,11 +565,13 @@ fn test_quality_weights_respect_ratios() -> Result<()> {
     gen.set_attribute(
         "weapon".to_string(),
         "".to_string(),
-        "damage".to_string(),
-        10.0,
-        1.0,
-        20.0,
-        true,
+        ItemAttribute::new(
+            "damage".to_string(),
+            10.0,
+            1.0,
+            20.0,
+            true,
+        ),
     );
     gen.set_item(
         "weapon".to_string(),
@@ -610,11 +622,13 @@ fn test_item_type_weights() -> Result<()> {
     gen.set_attribute(
         "weapon".to_string(),
         "".to_string(),
-        "damage".to_string(),
-        10.0,
-        1.0,
-        20.0,
-        true,
+        ItemAttribute::new(
+            "damage".to_string(),
+            10.0,
+            1.0,
+            20.0,
+            true,
+        ),
     );
 
     gen.set_item(
@@ -667,11 +681,13 @@ fn test_subtype_weights() -> Result<()> {
     gen.set_attribute(
         "weapon".to_string(),
         "".to_string(),
-        "damage".to_string(),
-        10.0,
-        1.0,
-        20.0,
-        true,
+        ItemAttribute::new(
+            "damage".to_string(),
+            10.0,
+            1.0,
+            20.0,
+            true,
+        ),
     );
 
     gen.set_item(
@@ -746,31 +762,37 @@ fn test_exponential_scaling_variance() -> Result<()> {
     gen.set_attribute(
         "weapon".to_string(),
         "".to_string(),
-        "attack".to_string(),
-        50.0,
-        10.0,
-        100.0,
-        true,
+        ItemAttribute::new(
+            "attack".to_string(),
+            50.0,
+            10.0,
+            100.0,
+            true,
+        ),
     );
 
     gen.set_attribute(
         "armor".to_string(),
         "".to_string(),
-        "defense".to_string(),
-        30.0,
-        5.0,
-        60.0,
-        true,
+        ItemAttribute::new(
+            "defense".to_string(),
+            30.0,
+            5.0,
+            60.0,
+            true,
+        ),
     );
 
     gen.set_attribute(
         "accessory".to_string(),
         "".to_string(),
-        "magic".to_string(),
-        20.0,
-        5.0,
-        50.0,
-        true,
+        ItemAttribute::new(
+            "magic".to_string(),
+            20.0,
+            5.0,
+            50.0,
+            true,
+        ),
     );
 
     // Set item names
@@ -852,11 +874,13 @@ fn test_minimal_single_item_generation() -> Result<()> {
     gen.set_attribute(
         "tool".to_string(),
         "".to_string(),
-        "durability".to_string(),
-        50.0,
-        10.0,
-        100.0,
-        true,
+        ItemAttribute::new(
+            "durability".to_string(),
+            50.0,
+            10.0,
+            100.0,
+            true,
+        ),
     );
 
     gen.set_item(
@@ -907,21 +931,25 @@ fn test_extreme_weight_skew() -> Result<()> {
     gen.set_attribute(
         "weapon".to_string(),
         "".to_string(),
-        "damage".to_string(),
-        10.0,
-        1.0,
-        20.0,
-        true,
+        ItemAttribute::new(
+            "damage".to_string(),
+            10.0,
+            1.0,
+            20.0,
+            true,
+        ),
     );
 
     gen.set_attribute(
         "special".to_string(),
         "".to_string(),
-        "power".to_string(),
-        100.0,
-        50.0,
-        150.0,
-        true,
+        ItemAttribute::new(
+            "power".to_string(),
+            100.0,
+            50.0,
+            150.0,
+            true,
+        ),
     );
 
     gen.set_item(
@@ -993,11 +1021,13 @@ fn test_many_item_types() -> Result<()> {
     gen.set_attribute(
         "weapon".to_string(),
         "".to_string(),
-        "damage".to_string(),
-        25.0,
-        5.0,
-        50.0,
-        true,
+        ItemAttribute::new(
+            "damage".to_string(),
+            25.0,
+            5.0,
+            50.0,
+            true,
+        ),
     );
 
     let options = GeneratorOptions {
@@ -1093,41 +1123,49 @@ fn test_full_rpg_loot_scenario() -> Result<()> {
     gen.set_attribute(
         "weapon".to_string(),
         "".to_string(),
-        "damage".to_string(),
-        30.0,
-        10.0,
-        60.0,
-        true,
+        ItemAttribute::new(
+            "damage".to_string(),
+            30.0,
+            10.0,
+            60.0,
+            true,
+        ),
     );
 
     gen.set_attribute(
         "armor".to_string(),
         "".to_string(),
-        "defense".to_string(),
-        20.0,
-        5.0,
-        40.0,
-        true,
+        ItemAttribute::new(
+            "defense".to_string(),
+            20.0,
+            5.0,
+            40.0,
+            true,
+        ),
     );
 
     gen.set_attribute(
         "accessory".to_string(),
         "".to_string(),
-        "bonus".to_string(),
-        10.0,
-        2.0,
-        20.0,
-        true,
+        ItemAttribute::new(
+            "bonus".to_string(),
+            10.0,
+            2.0,
+            20.0,
+            true,
+        ),
     );
 
     gen.set_attribute(
         "consumable".to_string(),
         "".to_string(),
-        "effect".to_string(),
-        5.0,
-        1.0,
-        10.0,
-        true,
+        ItemAttribute::new(
+            "effect".to_string(),
+            5.0,
+            1.0,
+            10.0,
+            true,
+        ),
     );
 
     // Generate with affix chance
@@ -1178,11 +1216,13 @@ fn test_linear_vs_exponential_scaling_comparison() -> Result<()> {
     gen.set_attribute(
         "gem".to_string(),
         "".to_string(),
-        "value".to_string(),
-        100.0,
-        50.0,
-        200.0,
-        true,
+        ItemAttribute::new(
+            "value".to_string(),
+            100.0,
+            50.0,
+            200.0,
+            true,
+        ),
     );
 
     gen.set_item(
@@ -1270,21 +1310,25 @@ fn test_override_cascade() -> Result<()> {
     gen.set_attribute(
         "weapon".to_string(),
         "".to_string(),
-        "damage".to_string(),
-        10.0,
-        1.0,
-        20.0,
-        true,
+        ItemAttribute::new(
+            "damage".to_string(),
+            10.0,
+            1.0,
+            20.0,
+            true,
+        ),
     );
 
     gen.set_attribute(
         "armor".to_string(),
         "".to_string(),
-        "defense".to_string(),
-        10.0,
-        1.0,
-        20.0,
-        true,
+        ItemAttribute::new(
+            "defense".to_string(),
+            10.0,
+            1.0,
+            20.0,
+            true,
+        ),
     );
 
     gen.set_item("weapon".to_string(), "sword".to_string(), vec!["sword".to_string()]);
@@ -1664,22 +1708,26 @@ fn test_attribute_updating_same_attribute() {
     gen.set_attribute(
         "weapon".to_string(),
         "".to_string(),
-        "damage".to_string(),
-        10.0,
-        1.0,
-        20.0,
-        true,
+        ItemAttribute::new(
+            "damage".to_string(),
+            10.0,
+            1.0,
+            20.0,
+            true,
+        ),
     );
 
     // Set same attribute again - should add to initial_value
     gen.set_attribute(
         "weapon".to_string(),
         "".to_string(),
-        "damage".to_string(),
-        5.0,
-        1.0,
-        20.0,
-        true,
+        ItemAttribute::new(
+            "damage".to_string(),
+            5.0,
+            1.0,
+            20.0,
+            true,
+        ),
     );
 
     assert!(gen.has_attribute("weapon", "", "damage"));
@@ -1720,11 +1768,13 @@ fn test_weighted_random_select_with_single_item() -> Result<()> {
     gen.set_attribute(
         "weapon".to_string(),
         "".to_string(),
-        "damage".to_string(),
-        10.0,
-        1.0,
-        20.0,
-        true,
+        ItemAttribute::new(
+            "damage".to_string(),
+            10.0,
+            1.0,
+            20.0,
+            true,
+        ),
     );
 
     let options = GeneratorOptions::default();
@@ -1925,11 +1975,13 @@ fn test_generated_item_contains_subtype_metadata() {
     gen.set_attribute(
         "weapon".to_string(),
         "".to_string(),
-        "damage".to_string(),
-        10.0,
-        1.0,
-        20.0,
-        true,
+        ItemAttribute::new(
+            "damage".to_string(),
+            10.0,
+            1.0,
+            20.0,
+            true,
+        ),
     );
 
     // Setup item names

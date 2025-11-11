@@ -149,7 +149,7 @@ impl PraedaGenerator {
         let type_key = (item_type, subtype);
         self.subtype_metadata
             .entry(type_key)
-            .or_insert_with(HashMap::new)
+            .or_default()
             .insert(key, value);
     }
 
@@ -186,7 +186,7 @@ impl PraedaGenerator {
         let type_key = (item_type, subtype, item_name);
         self.item_name_metadata
             .entry(type_key)
-            .or_insert_with(HashMap::new)
+            .or_default()
             .insert(key, value);
     }
 
@@ -220,25 +220,15 @@ impl PraedaGenerator {
         &mut self,
         type_name: String,
         subtype: String,
-        name: String,
-        initial_value: f64,
-        min: f64,
-        max: f64,
-        required: bool,
+        attribute: ItemAttribute,
     ) {
         let key = (type_name, subtype);
-        let attributes = self.item_attributes.entry(key).or_insert_with(Vec::new);
+        let attributes = self.item_attributes.entry(key).or_default();
 
-        if let Some(pos) = attributes.iter().position(|a| a.name == name) {
-            attributes[pos].initial_value += initial_value;
+        if let Some(pos) = attributes.iter().position(|a| a.name == attribute.name) {
+            attributes[pos].initial_value += attribute.initial_value;
         } else {
-            attributes.push(ItemAttribute::new(
-                name,
-                initial_value,
-                min,
-                max,
-                required,
-            ));
+            attributes.push(attribute);
         }
     }
 
@@ -274,20 +264,9 @@ impl PraedaGenerator {
         subtype: String,
         is_prefix: bool,
         affix_name: String,
-        attr_name: String,
-        initial_value: f64,
-        min: f64,
-        max: f64,
-        required: bool,
+        attribute: ItemAttribute,
     ) {
         let key = (type_name.clone(), subtype.clone());
-        let attribute = ItemAttribute::new(
-            attr_name,
-            initial_value,
-            min,
-            max,
-            required,
-        );
 
         let affix_data = self
             .item_affixes
@@ -582,7 +561,7 @@ impl PraedaGenerator {
         }
 
         // Attach per-item metadata to the item (overrides subtype metadata if both exist)
-        if let Some(metadata) = self.get_all_item_name_metadata(&item_type, &subtype, &item.get_name()) {
+        if let Some(metadata) = self.get_all_item_name_metadata(&item_type, &subtype, item.get_name()) {
             for (key, value) in metadata {
                 item.set_metadata(key.clone(), value.clone());
             }
