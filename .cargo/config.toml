@@ -1,9 +1,9 @@
 [alias]
-# Coverage command that excludes UI/state files that can't be easily tested
-coverage = "tarpaulin --all-features --workspace --timeout 120 --exclude-files src/error.rs --out html --out xml --output-dir coverage"
+# Full coverage report with HTML and XML output
+coverage = "tarpaulin --all-features --timeout 120 --out html --out xml --output-dir coverage"
 
 # Quick coverage check (just show percentage)
-coverage-check = "tarpaulin --all-features --workspace --timeout 120 --exclude-files src/error.rs"
+coverage-check = "tarpaulin --all-features --timeout 120"
 
 # Coverage with lcov output
-coverage-lcov = "tarpaulin --all-features --workspace --timeout 120 --exclude-files src/error.rs --out lcov"
+coverage-lcov = "tarpaulin --all-features --timeout 120 --out lcov"
