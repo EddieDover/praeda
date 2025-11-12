@@ -29,6 +29,24 @@ This enables:
 - **Conventional Commits validation** - Enforces commit message format
 - **Pre-commit checks** - Runs clippy and tests before each commit
 
+Check code coverage:
+```bash
+# Quick coverage check
+cargo coverage-check
+
+# Full coverage report with HTML
+cargo coverage
+
+# Coverage with lcov format
+cargo coverage-lcov
+```
+
+Or use the helper script:
+```bash
+./scripts/coverage.sh        # Uses default 85% threshold
+./scripts/coverage.sh 75     # Custom threshold
+```
+
 ## Example: Loot Generator CLI
 
 Praeda includes a complete command-line example that demonstrates generating items from a TOML configuration file with full control over generation parameters.
