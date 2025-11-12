@@ -1,8 +1,12 @@
 # Praeda
 
-This library provides a flexible system for randomly generating items with affixes, attributes, and quality tiers.
+This library provides a flexible system for randomly generating items/loot with affixes, attributes, and quality tiers.
 
 ## Quick Start
+
+Choose your usage path below:
+
+### A) Using Praeda as a Rust Library
 
 Add to your `Cargo.toml`:
 ```toml
@@ -10,42 +14,55 @@ Add to your `Cargo.toml`:
 praeda = { git = "https://www.github.com/EddieDover/praeda.git", branch = "master" }
 ```
 
-Build and test:
-```bash
-# Build the library
-cargo build --lib
+Then see the **[Rust Library Usage](#using-as-a-rust-library)** section for detailed examples.
 
-# Run tests
-cargo test
+### B) Using Praeda from C++
+
+1. Build the shared library:
+```bash
+cargo build --release
 ```
 
-Setup git hooks (optional but recommended):
+2. See the complete working example in **[examples/cpp/](examples/cpp/)** directory which includes:
+   - `test_praeda.cpp` - Full test program demonstrating programmatic and TOML-based configuration
+   - `praeda.hpp` - Header file to copy to your project
+   - `CMakeLists.txt` - Build configuration
+
+3. For detailed C++ integration guide, see **[FFI.md](FFI.md)**.
+
+### C) Using Praeda from C#
+
+1. Build the shared library:
 ```bash
-# Enable pre-commit checks and conventional commits validation
-./scripts/setup-hooks.sh
+cargo build --release
 ```
 
-This enables:
-- **Conventional Commits validation** - Enforces commit message format
-- **Pre-commit checks** - Runs clippy and tests before each commit
+2. See the complete working example in **[examples/csharp/](examples/csharp/)** directory which includes:
+   - `PraedaTest.cs` - Full test program demonstrating programmatic and TOML-based configuration
+   - `PraedaGenerator.cs` - Wrapper class to use in your projects
+   - `PraedaTest.csproj` - Project configuration
 
-Check code coverage:
+3. For detailed C# integration guide, see **[FFI.md](FFI.md)**.
+
+### D) Using the CLI Tool
+
 ```bash
-# Quick coverage check
-cargo coverage-check
-
-# Full coverage report with HTML
-cargo coverage
-
-# Coverage with lcov format
-cargo coverage-lcov
+cargo run --example loot_generator -- \
+  --input examples/test_data.toml \
+  --output loot.json \
+  --num-items 10
 ```
 
-Or use the helper script:
-```bash
-./scripts/coverage.sh        # Uses default 85% threshold
-./scripts/coverage.sh 75     # Custom threshold
-```
+See **[Loot Generator CLI](#example-loot-generator-cli)** section for detailed examples.
+
+### Development Setup
+
+For detailed development instructions, see [CONTRIBUTING.md](CONTRIBUTING.md) which includes:
+- Setting up git hooks for code quality
+- Conventional Commits standards
+- Code coverage requirements (85% threshold)
+- Pull request process
+- Development tips and useful commands
 
 ## Example: Loot Generator CLI
 
@@ -334,6 +351,33 @@ if let Some(metadata) = gen.get_item_metadata("weapon", "sword", "longsword") {
 ```
 
 Both metadata types support any JSON-serializable value, giving you full flexibility to extend the item system with custom properties.
+
+
+## CLI Example
+
+Praeda includes a command-line tool that demonstrates the library:
+
+```bash
+# View help
+cargo run --example loot_generator -- --help
+
+# Generate items with defaults
+cargo run --example loot_generator -- \
+  --input examples/test_data.toml \
+  --output loot.json \
+  --num-items 10
+
+# Custom parameters
+cargo run --example loot_generator -- \
+  --input examples/test_data.toml \
+  --output loot.json \
+  --num-items 20 \
+  --base-level 15.0 \
+  --level-variance 8.0 \
+  --affix-chance 0.5 \
+  --exponential \
+  --scaling-factor 1.2
+```
 
 ## API Methods
 
