@@ -132,11 +132,50 @@ See `examples/test_data.toml` for a complete, working configuration example with
 
 ### Using as a Rust Library
 
-Here's how to use Praeda in your Rust project:
+#### Option 1: Load Configuration from TOML File
+
+The simplest approach - load a TOML configuration file:
 
 ```rust
 use praeda::*;
-use std::collections::HashMap;
+
+fn main() -> Result<()> {
+    let mut gen = PraedaGenerator::new();
+
+    // Load configuration from TOML file
+    gen.load_toml_file("examples/test_data.toml")?;
+
+    // Generate loot with options
+    let options = GeneratorOptions {
+        number_of_items: 5,
+        base_level: 10.0,
+        level_variance: 5.0,
+        affix_chance: 0.25,
+        linear: true,
+        scaling_factor: 1.0,
+    };
+
+    let items = gen.generate_loot(
+        &options,
+        &GeneratorOverrides::empty(),
+        "main"
+    )?;
+
+    // Use the generated items
+    for item in items {
+        println!("{} [{}] {}", item.get_quality(), item.get_subtype(), item.get_name());
+    }
+
+    Ok(())
+}
+```
+
+#### Option 2: Programmatic Configuration
+
+For dynamic configuration without TOML files:
+
+```rust
+use praeda::*;
 
 fn main() -> Result<()> {
     let mut gen = PraedaGenerator::new();
