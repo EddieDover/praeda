@@ -23,13 +23,12 @@ Then see the **[Rust Library Usage](#using-as-a-rust-library)** section for deta
 cargo build --release
 ```
 
-2. Copy headers and library:
-```bash
-cp include/praeda.hpp /path/to/your/project/include/
-cp target/release/libpraeda.so /path/to/your/project/lib/
-```
+2. See the complete working example in **[examples/cpp/](examples/cpp/)** directory which includes:
+   - `test_praeda.cpp` - Full test program demonstrating programmatic and TOML-based configuration
+   - `praeda.hpp` - Header file to copy to your project
+   - `CMakeLists.txt` - Build configuration
 
-3. See **[FFI.md](FFI.md)** for complete C++ integration guide and examples.
+3. For detailed C++ integration guide, see **[FFI.md](FFI.md)**.
 
 ### C) Using Praeda from C#
 
@@ -38,18 +37,12 @@ cp target/release/libpraeda.so /path/to/your/project/lib/
 cargo build --release
 ```
 
-2. Copy the DLL/SO:
-```bash
-cp target/release/praeda.dll /path/to/your/project/bin/  # Windows
-cp target/release/libpraeda.so /path/to/your/project/bin/  # Linux
-```
+2. See the complete working example in **[examples/csharp/](examples/csharp/)** directory which includes:
+   - `PraedaTest.cs` - Full test program demonstrating programmatic and TOML-based configuration
+   - `PraedaGenerator.cs` - Wrapper class to use in your projects
+   - `PraedaTest.csproj` - Project configuration
 
-3. Copy the C# wrapper:
-```bash
-cp bindings/PraedaGenerator.cs /path/to/your/project/
-```
-
-4. See **[FFI.md](FFI.md)** for complete C# integration guide and examples.
+3. For detailed C# integration guide, see **[FFI.md](FFI.md)**.
 
 ### D) Using the CLI Tool
 
