@@ -1,7 +1,5 @@
 use praeda::*;
 use std::collections::HashMap; // Used in test_item_struct
-use std::fs;
-use std::path::Path;
 
 /// Helper to create a basic generator with standard configuration
 fn create_test_generator() -> PraedaGenerator {
@@ -850,7 +848,7 @@ fn test_exponential_scaling_variance() -> Result<()> {
     // Verify all items have expected types
     let valid_types: Vec<&str> = vec!["weapon", "armor", "accessory"];
     for item in &items {
-        assert!(valid_types.contains(&item.get_type().as_ref()));
+        assert!(valid_types.contains(&item.get_type()));
     }
 
     // Verify quality distribution roughly matches weights (1421 total weight)
@@ -1378,8 +1376,8 @@ fn test_load_toml_data() -> Result<()> {
     gen.load_data_toml_from_file(toml_path)?;
 
     // Verify TOML was loaded
-    assert!(gen.get_quality_data().len() > 0);
-    assert!(gen.get_item_types().len() > 0);
+    assert!(!gen.get_quality_data().is_empty());
+    assert!(!gen.get_item_types().is_empty());
 
     Ok(())
 }
@@ -1440,7 +1438,7 @@ fn test_item_attribute_setters() {
     assert_eq!(attr.get_max(), 50.0);
 
     attr.set_required(true);
-    assert_eq!(attr.get_required(), true);
+    assert!(attr.get_required());
 }
 
 #[test]
@@ -1855,7 +1853,7 @@ fn test_has_attribute_missing_attributes() {
 
 #[test]
 fn test_get_prefixes_missing() {
-    let mut gen = PraedaGenerator::new();
+    let gen = PraedaGenerator::new();
 
     // No affixes defined - tests the rare path in get_prefixes
     let prefixes = gen.get_prefixes("weapon", "");
@@ -1864,7 +1862,7 @@ fn test_get_prefixes_missing() {
 
 #[test]
 fn test_get_suffixes_missing() {
-    let mut gen = PraedaGenerator::new();
+    let gen = PraedaGenerator::new();
 
     // No affixes defined - tests the rare path in get_suffixes
     let suffixes = gen.get_suffixes("weapon", "");
