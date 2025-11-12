@@ -97,7 +97,7 @@ impl CAffix {
                 for i in 0..self.attributes_count {
                     (*self.attributes.add(i as usize)).free();
                 }
-                let _ = Box::from_raw(std::slice::from_raw_parts_mut(
+                let _ = Box::from_raw(std::ptr::slice_from_raw_parts_mut(
                     self.attributes,
                     self.attributes_count as usize,
                 ));
@@ -196,7 +196,7 @@ impl CItem {
                 for i in 0..self.attributes_count {
                     (*self.attributes.add(i as usize)).free();
                 }
-                let _ = Box::from_raw(std::slice::from_raw_parts_mut(
+                let _ = Box::from_raw(std::ptr::slice_from_raw_parts_mut(
                     self.attributes,
                     self.attributes_count as usize,
                 ));
@@ -293,7 +293,7 @@ pub extern "C" fn praeda_item_array_free(handle: *mut CItemArrayHandle) {
                 for i in 0..array_handle.array.count {
                     (*array_handle.array.items.add(i as usize)).free();
                 }
-                let _ = Box::from_raw(std::slice::from_raw_parts_mut(
+                let _ = Box::from_raw(std::ptr::slice_from_raw_parts_mut(
                     array_handle.array.items,
                     array_handle.array.count as usize,
                 ));
