@@ -1,8 +1,5 @@
 #include "praeda.hpp"
-#include <nlohmann/json.hpp>
 #include <iostream>
-
-using json = nlohmann::json;
 
 int main() {
     try {
@@ -34,10 +31,10 @@ int main() {
         std::cout << "✓ Item subtypes set" << std::endl;
 
         std::cout << "Setting attributes..." << std::endl;
-        gen->set_attribute("weapon", "",
-            praeda::ItemAttribute("damage", 15.0, 5.0, 30.0, true));
-        gen->set_attribute("armor", "",
-            praeda::ItemAttribute("defense", 10.0, 2.0, 20.0, true));
+        praeda::ItemAttribute damage_attr("damage", 15.0, 5.0, 30.0, true);
+        gen->set_attribute("weapon", "", damage_attr);
+        praeda::ItemAttribute defense_attr("defense", 10.0, 2.0, 20.0, true);
+        gen->set_attribute("armor", "", defense_attr);
         std::cout << "✓ Attributes set" << std::endl;
 
         std::cout << "Setting item names..." << std::endl;
@@ -49,50 +46,126 @@ int main() {
         // Test 2: Query Methods
         std::cout << "--- Test 2: Query Methods ---" << std::endl;
 
-        std::string quality_json = gen->get_quality_data();
-        json qualities = json::parse(quality_json);
-        std::cout << "Quality data: " << qualities.dump(2) << std::endl << std::endl;
-
         bool has_common = gen->has_quality("common");
         std::cout << "Has quality 'common': " << (has_common ? "true" : "false") << std::endl;
 
         bool has_epic = gen->has_quality("epic");
         std::cout << "Has quality 'epic': " << (has_epic ? "true" : "false") << std::endl << std::endl;
 
-        // Test 3: Generate Loot
-        std::cout << "--- Test 3: Loot Generation ---" << std::endl;
+        // Test 3: Load Configuration from TOML
+        std::cout << "--- Test 3: Load Configuration from TOML ---" << std::endl;
 
-        json options = {
-            {"number_of_items", 5},
-            {"base_level", 15.0},
-            {"level_variance", 5.0},
-            {"affix_chance", 0.75},
-            {"linear", true},
-            {"scaling_factor", 1.0}
-        };
+        std::string toml_config = R"(
+[quality_data]
+common = 100
+uncommon = 60
+rare = 30
+legendary = 5
 
-        std::cout << "Generating 5 items..." << std::endl;
-        std::string items_json = gen->generate_loot(options.dump());
-        json items = json::parse(items_json);
+[[item_types]]
+item_type = "weapon"
+weight = 2
+[item_types.subtypes]
+sword = 3
+axe = 2
+
+[[item_types]]
+item_type = "armor"
+weight = 1
+[item_types.subtypes]
+chest = 1
+
+[[item_list]]
+item_type = "weapon"
+subtype = "sword"
+names = ["longsword", "shortsword", "bastard_sword"]
+
+[[item_list]]
+item_type = "weapon"
+subtype = "axe"
+names = ["battleaxe", "hand_axe"]
+
+[[item_list]]
+item_type = "armor"
+subtype = "chest"
+names = ["plate_armor", "leather_armor"]
+)";
+
+        std::cout << "Loading TOML configuration..." << std::endl;
+        auto gen_toml = praeda::Generator::create();
+        gen_toml->load_toml_string(toml_config);
+        std::cout << "✓ TOML configuration loaded" << std::endl << std::endl;
+
+        // Test 4: Generate Loot with Native Options from Programmatic Config
+        std::cout << "--- Test 4: Loot Generation with Native Options (Programmatic) ---" << std::endl;
+
+        praeda::GenerationOptions options;
+        options.number_of_items = 5;
+        options.base_level = 15.0;
+        options.level_variance = 5.0;
+        options.affix_chance = 0.75;
+        options.linear = true;
+        options.scaling_factor = 1.0;
+
+        std::cout << "Generating 5 items with programmatic config..." << std::endl;
+        auto items = gen->generate_loot(options);
 
         std::cout << "✓ Generated " << items.size() << " items:" << std::endl;
         for (size_t i = 0; i < items.size(); ++i) {
             const auto& item = items[i];
-            std::cout << "  " << (i+1) << ". [" << item["quality"].get<std::string>()
-                      << "] " << item["type"].get<std::string>()
-                      << " / " << item["subtype"].get<std::string>()
-                      << " - " << item["name"].get<std::string>() << std::endl;
+            std::cout << "  " << (i+1) << ". [" << item.quality
+                      << "] " << item.type
+                      << " / " << item.subtype
+                      << " - " << item.name << std::endl;
+
+            // Display attributes from native Item object
+            if (!item.attributes.empty()) {
+                std::cout << "      Attributes:" << std::endl;
+                for (const auto& [key, attr] : item.attributes) {
+                    std::cout << "        - " << attr.name << ": " << attr.initial_value
+                              << " [" << attr.min << "-" << attr.max << "]" << std::endl;
+                }
+            }
         }
         std::cout << std::endl;
 
-        // Test 4: Generator Info
-        std::cout << "--- Test 4: Generator Info ---" << std::endl;
-        std::string info_json = gen->info();
-        json info = json::parse(info_json);
-        std::cout << "Generator info:" << std::endl;
-        std::cout << "  Version: " << info["version"].get<std::string>() << std::endl;
-        std::cout << "  Qualities: " << info["qualities"].get<int>() << std::endl;
-        std::cout << "  Item types: " << info["item_types"].get<int>() << std::endl;
+        // Test 5: Generate Loot from TOML Configuration
+        std::cout << "--- Test 5: Loot Generation with Native Options (TOML) ---" << std::endl;
+
+        praeda::GenerationOptions toml_options;
+        toml_options.number_of_items = 3;
+        toml_options.base_level = 10.0;
+        toml_options.level_variance = 2.0;
+        toml_options.affix_chance = 0.5;
+        toml_options.linear = true;
+        toml_options.scaling_factor = 1.0;
+
+        std::cout << "Generating 3 items with TOML config..." << std::endl;
+        auto toml_items = gen_toml->generate_loot(toml_options);
+
+        std::cout << "✓ Generated " << toml_items.size() << " items from TOML:" << std::endl;
+        for (size_t i = 0; i < toml_items.size(); ++i) {
+            const auto& item = toml_items[i];
+            std::cout << "  " << (i+1) << ". [" << item.quality
+                      << "] " << item.type
+                      << " / " << item.subtype
+                      << " - " << item.name << std::endl;
+
+            // Display attributes from native Item object
+            if (!item.attributes.empty()) {
+                std::cout << "      Attributes:" << std::endl;
+                for (const auto& [key, attr] : item.attributes) {
+                    std::cout << "        - " << attr.name << ": " << attr.initial_value
+                              << " [" << attr.min << "-" << attr.max << "]" << std::endl;
+                }
+            }
+        }
+        std::cout << std::endl;
+
+        // Test 6: Generator Info
+        std::cout << "--- Test 6: Generator Info ---" << std::endl;
+        std::string info = gen->info();
+        std::cout << "Generator info retrieved (raw format): " << info.substr(0, 50) << "..." << std::endl;
         std::cout << std::endl;
 
         std::cout << "=== All Tests Passed! ===" << std::endl;

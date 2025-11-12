@@ -4,23 +4,14 @@ This document describes how to use Praeda from C++, C#, and other languages via 
 
 ## Overview
 
-Praeda exposes a C-compatible FFI layer that allows usage from any language that can call C functions. All data is exchanged through JSON strings for simplicity and language independence.
-
-```
-Praeda Rust Library
-    ↓
-[C FFI Layer] (src/ffi.rs)
-    ↙              ↘
-C++ Wrapper     C# Wrapper
-(include/praeda.hpp) (bindings/PraedaGenerator.cs)
-```
+Praeda exposes a C-compatible FFI layer that allows usage from any language that can call C functions. All data is exchanged through **C-compatible structs and simple status codes**
 
 ## Building for FFI
 
 ### Prerequisites
 
 - Rust 1.70+
-- For C++: C++17 compiler, nlohmann/json
+- For C++: C++17 compiler
 - For C#: .NET 6.0+
 
 ### Build Steps
@@ -68,17 +59,14 @@ target_link_libraries(your_target ${PRAEDA_LIB})
 
 ```cpp
 #include "praeda.hpp"
-#include <nlohmann/json.hpp>
 #include <iostream>
-
-using json = nlohmann::json;
 
 int main() {
     try {
         // Create generator
         auto gen = praeda::Generator::create();
 
-        // Load configuration
+        // Load configuration from TOML
         gen->load_toml_string(R"(
             [quality_data]
             common = 100
@@ -92,21 +80,24 @@ int main() {
             sword = 1
         )");
 
-        // Generate items
-        json options = {
-            {"number_of_items", 10},
-            {"base_level", 15.0},
-            {"level_variance", 5.0},
-            {"affix_chance", 0.75},
-            {"linear", true},
-            {"scaling_factor", 1.0}
+        // Generate items using native C++ types
+        praeda::GenerationOptions options{
+            .number_of_items = 10,
+            .base_level = 15.0,
+            .level_variance = 5.0,
+            .affix_chance = 0.75,
+            .linear = true,
+            .scaling_factor = 1.0
         };
 
-        std::string items_json = gen->generate_loot(options.dump());
-        json items = json::parse(items_json);
+        auto items = gen->generate_loot(options);
 
         std::cout << "Generated " << items.size() << " items:" << std::endl;
-        std::cout << items.dump(2) << std::endl;
+        for (const auto& item : items) {
+            std::cout << "[" << item.quality << "] "
+                      << item.type << "/" << item.subtype
+                      << " - " << item.name << std::endl;
+        }
 
     } catch (const praeda::Exception& e) {
         std::cerr << "Praeda error: " << e.what() << std::endl;
@@ -122,10 +113,7 @@ You can also configure the generator programmatically without needing TOML files
 
 ```cpp
 #include "praeda.hpp"
-#include <nlohmann/json.hpp>
 #include <iostream>
-
-using json = nlohmann::json;
 
 int main() {
     try {
@@ -149,31 +137,32 @@ int main() {
         gen->set_item_subtype("armor", "chest", 1);
 
         // Set attributes
-        gen->set_attribute("weapon", "",
-            praeda::ItemAttribute("damage", 15.0, 5.0, 30.0, true));
-        gen->set_attribute("armor", "",
-            praeda::ItemAttribute("defense", 10.0, 2.0, 20.0, true));
+        gen->set_attribute("weapon", "", "damage", 15.0, 5.0, 30.0, true);
+        gen->set_attribute("armor", "", "defense", 10.0, 2.0, 20.0, true);
 
         // Set item names
         gen->set_item_names("weapon", "sword", {"longsword", "shortsword"});
         gen->set_item_names("weapon", "axe", {"battleaxe"});
         gen->set_item_names("armor", "chest", {"plate_armor", "leather_armor"});
 
-        // Generate items
-        json options = {
-            {"number_of_items", 10},
-            {"base_level", 15.0},
-            {"level_variance", 5.0},
-            {"affix_chance", 0.75},
-            {"linear", true},
-            {"scaling_factor", 1.0}
+        // Generate items using native C++ types
+        praeda::GenerationOptions options{
+            .number_of_items = 10,
+            .base_level = 15.0,
+            .level_variance = 5.0,
+            .affix_chance = 0.75,
+            .linear = true,
+            .scaling_factor = 1.0
         };
 
-        std::string items_json = gen->generate_loot(options.dump());
-        json items = json::parse(items_json);
+        auto items = gen->generate_loot(options);
 
         std::cout << "Generated " << items.size() << " items:" << std::endl;
-        std::cout << items.dump(2) << std::endl;
+        for (const auto& item : items) {
+            std::cout << "[" << item.quality << "] "
+                      << item.type << "/" << item.subtype
+                      << " - " << item.name << std::endl;
+        }
 
     } catch (const praeda::Exception& e) {
         std::cerr << "Praeda error: " << e.what() << std::endl;
@@ -221,23 +210,19 @@ Set item names for a type/subtype.
 Load configuration from TOML string (alternative to programmatic methods).
 - Throws: `praeda::Exception` on parse error
 
-#### `gen->generate_loot(const std::string& options_json)`
+#### `gen->generate_loot(const GenerationOptions& options)`
 Generate loot items.
-- Parameter: JSON string with generation options
-- Returns: JSON array string of items
+- Parameter: Generation options struct (number_of_items, base_level, etc.)
+- Returns: `std::vector<Item>` of generated items
 - Throws: `praeda::Exception` on error
-
-#### `gen->get_quality_data()`
-Get all quality data as JSON.
-- Returns: JSON object mapping quality names to weights
 
 #### `gen->has_quality(const std::string&)`
 Check if a quality exists.
 - Returns: `bool`
 
 #### `gen->info()`
-Get generator information.
-- Returns: JSON object with generator stats
+Get generator information (version string).
+- Returns: Version string (e.g., "0.1.5")
 
 #### `praeda::version()`
 Get library version.
@@ -249,34 +234,31 @@ Get library version.
 
 1. Copy the wrapper:
 ```bash
-cp bindings/PraedaGenerator.cs /path/to/your/project/
+cp examples/csharp/PraedaGenerator.cs /path/to/your/project/
 ```
 
-2. Copy the shared library:
+2. Copy the shared library and set library path:
 ```bash
-# Windows
-cp target/release/praeda.dll /path/to/your/project/bin/Debug/
+# Set LD_LIBRARY_PATH before running
+export LD_LIBRARY_PATH=/path/to/praeda/target/release:$LD_LIBRARY_PATH
 
-# Linux
-cp target/release/libpraeda.so /path/to/your/project/bin/Debug/
-
-# macOS
-cp target/release/libpraeda.dylib /path/to/your/project/bin/Debug/
+# Or on macOS
+export DYLD_LIBRARY_PATH=/path/to/praeda/target/release:$DYLD_LIBRARY_PATH
 ```
 
-3. Update library name if needed:
+3. The library name is automatically detected:
 ```csharp
-// In PraedaGenerator.cs, adjust:
-private const string DLL_NAME = "praeda";  // Windows adds .dll automatically
-// On Linux: "praeda" loads libpraeda.so
-// On macOS: "praeda" loads libpraeda.dylib
+// In PraedaGenerator.cs:
+private const string DllName = "praeda";  // Automatically loads correct library per platform
+// Windows: praeda.dll
+// Linux: libpraeda.so
+// macOS: libpraeda.dylib
 ```
 
 ### Basic Example
 
 ```csharp
 using System;
-using System.Text.Json;
 using Praeda;
 
 class Program {
@@ -285,7 +267,7 @@ class Program {
             // Create generator
             using var gen = new PraedaGenerator();
 
-            // Load configuration
+            // Load configuration from TOML
             gen.LoadTomlString(@"
                 [quality_data]
                 common = 100
@@ -299,7 +281,7 @@ class Program {
                 sword = 1
             ");
 
-            // Generate items
+            // Generate items using native C# types
             var options = new GenerationOptions {
                 NumberOfItems = 10,
                 BaseLevel = 15.0,
@@ -309,12 +291,12 @@ class Program {
                 ScalingFactor = 1.0
             };
 
-            string itemsJson = PraedaHelper.GenerateLoot(gen, options);
-            var items = JsonDocument.Parse(itemsJson);
+            var items = gen.GenerateLoot(options);
 
-            Console.WriteLine($"Generated {items.RootElement.GetArrayLength()} items:");
-            Console.WriteLine(JsonSerializer.Serialize(items,
-                new JsonSerializerOptions { WriteIndented = true }));
+            Console.WriteLine($"Generated {items.Count} items:");
+            foreach (var item in items) {
+                Console.WriteLine($"[{item.Quality}] {item.Type}/{item.Subtype} - {item.Name}");
+            }
 
         } catch (Exception ex) {
             Console.Error.WriteLine($"Error: {ex.Message}");
@@ -331,8 +313,6 @@ You can also configure the generator programmatically without needing TOML files
 
 ```csharp
 using System;
-using System.Text.Json;
-using System.Collections.Generic;
 using Praeda;
 
 class Program {
@@ -366,7 +346,7 @@ class Program {
             gen.SetItemNames("weapon", "axe", new[] { "battleaxe" });
             gen.SetItemNames("armor", "chest", new[] { "plate_armor", "leather_armor" });
 
-            // Generate items
+            // Generate items using native C# types
             var options = new GenerationOptions {
                 NumberOfItems = 10,
                 BaseLevel = 15.0,
@@ -376,12 +356,12 @@ class Program {
                 ScalingFactor = 1.0
             };
 
-            string itemsJson = PraedaHelper.GenerateLoot(gen, options);
-            var items = JsonDocument.Parse(itemsJson);
+            var items = gen.GenerateLoot(options);
 
-            Console.WriteLine($"Generated {items.RootElement.GetArrayLength()} items:");
-            Console.WriteLine(JsonSerializer.Serialize(items,
-                new JsonSerializerOptions { WriteIndented = true }));
+            Console.WriteLine($"Generated {items.Count} items:");
+            foreach (var item in items) {
+                Console.WriteLine($"[{item.Quality}] {item.Type}/{item.Subtype} - {item.Name}");
+            }
 
         } catch (Exception ex) {
             Console.Error.WriteLine($"Error: {ex.Message}");
@@ -403,20 +383,11 @@ Create a new generator instance.
 Load configuration from TOML string.
 - Throws: `InvalidOperationException` on error
 
-#### `gen.LoadTomlFile(string filePath)`
-Load configuration from a file.
-- Throws: `System.IO.FileNotFoundException` if file not found
-- Throws: `InvalidOperationException` on parse error
-
-#### `gen.GenerateLoot(string optionsJson)`
+#### `gen.GenerateLoot(GenerationOptions options)`
 Generate loot items.
-- Parameter: JSON string with generation options
-- Returns: JSON array string
+- Parameter: Generation options struct (NumberOfItems, BaseLevel, etc.)
+- Returns: `List<Item>` of generated items
 - Throws: `InvalidOperationException` on error
-
-#### `gen.GetQualityData()`
-Get quality data as JSON.
-- Returns: JSON object string
 
 #### `gen.HasQuality(string quality)`
 Check if a quality exists.
@@ -424,39 +395,45 @@ Check if a quality exists.
 - Throws: `InvalidOperationException` on error
 
 #### `gen.GetInfo()`
-Get generator information.
-- Returns: JSON object string
-
-#### `PraedaGenerator.GetVersion()`
-Get library version.
+Get generator information (version string).
 - Returns: Version string
-
-#### `PraedaHelper.GenerateLoot(gen, options)`
-Convenience method for strongly-typed options.
 
 ## Generation Options
 
-Both C++ and C# expect generation options as JSON:
+Both C++ and C# use strongly-typed `GenerationOptions` structs:
 
-```json
-{
-  "number_of_items": 10,
-  "base_level": 15.0,
-  "level_variance": 5.0,
-  "affix_chance": 0.75,
-  "linear": true,
-  "scaling_factor": 1.0
-}
+### C++
+```cpp
+praeda::GenerationOptions options{
+    .number_of_items = 10,
+    .base_level = 15.0,
+    .level_variance = 5.0,
+    .affix_chance = 0.75,
+    .linear = true,
+    .scaling_factor = 1.0
+};
+```
+
+### C#
+```csharp
+var options = new GenerationOptions {
+    NumberOfItems = 10,
+    BaseLevel = 15.0,
+    LevelVariance = 5.0,
+    AffixChance = 0.75,
+    Linear = true,
+    ScalingFactor = 1.0
+};
 ```
 
 ### Option Descriptions
 
-- **number_of_items** (uint): How many items to generate (default: 1)
-- **base_level** (float): Average item level (default: 10.0)
-- **level_variance** (float): Range around base level (default: 5.0)
-- **affix_chance** (float): Probability of affixes 0.0-1.0 (default: 0.75)
-- **linear** (bool): Use linear scaling if true, exponential if false (default: true)
-- **scaling_factor** (float): Attribute scaling multiplier (default: 1.0)
+- **NumberOfItems** (uint): How many items to generate (default: 1)
+- **BaseLevel** (float): Average item level (default: 10.0)
+- **LevelVariance** (float): Range around base level (default: 5.0)
+- **AffixChance** (float): Probability of affixes 0.0-1.0 (default: 0.75)
+- **Linear** (bool): Use linear scaling if true, exponential if false (default: true)
+- **ScalingFactor** (float): Attribute scaling multiplier (default: 1.0)
 
 ## Configuration Format
 
@@ -577,10 +554,9 @@ dotnet run
 - Check the FFI header matches the library version
 - Try rebuilding: `cargo clean && cargo build --release`
 
-### JSON Parsing Error
-- Ensure JSON is valid before passing to Praeda
-- Use `JsonSerializer.Serialize()` in C# for safe conversion
-- Use `json::dump()` in C++ after parsing with nlohmann
+### Type Errors or Crashes
+- Ensure struct fields are properly initialized
+- Check that all required configuration is set before generating loot
 
 ### Memory Leaks
 - Ensure generators are properly freed (use RAII/using patterns)

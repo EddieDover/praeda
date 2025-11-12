@@ -1,5 +1,4 @@
 using System;
-using System.Text.Json;
 using System.Collections.Generic;
 using Praeda;
 
@@ -17,53 +16,35 @@ class Program {
             Console.WriteLine("--- Test 1: Programmatic Configuration ---");
 
             Console.WriteLine("Setting qualities...");
-            var result = gen.SetQualityData("common", 100);
-            if (!result) throw new Exception("Failed to set quality");
-            result = gen.SetQualityData("uncommon", 60);
-            if (!result) throw new Exception("Failed to set quality");
-            result = gen.SetQualityData("rare", 30);
-            if (!result) throw new Exception("Failed to set quality");
+            if (!gen.SetQualityData("common", 100)) throw new Exception("Failed to set quality");
+            if (!gen.SetQualityData("uncommon", 60)) throw new Exception("Failed to set quality");
+            if (!gen.SetQualityData("rare", 30)) throw new Exception("Failed to set quality");
             Console.WriteLine("✓ Qualities set");
 
             Console.WriteLine("Setting item types...");
-            result = gen.SetItemType("weapon", 2);
-            if (!result) throw new Exception("Failed to set item type");
-            result = gen.SetItemType("armor", 1);
-            if (!result) throw new Exception("Failed to set item type");
+            if (!gen.SetItemType("weapon", 2)) throw new Exception("Failed to set item type");
+            if (!gen.SetItemType("armor", 1)) throw new Exception("Failed to set item type");
             Console.WriteLine("✓ Item types set");
 
             Console.WriteLine("Setting item subtypes...");
-            result = gen.SetItemSubtype("weapon", "sword", 3);
-            if (!result) throw new Exception("Failed to set item subtype");
-            result = gen.SetItemSubtype("weapon", "axe", 2);
-            if (!result) throw new Exception("Failed to set item subtype");
-            result = gen.SetItemSubtype("armor", "chest", 1);
-            if (!result) throw new Exception("Failed to set item subtype");
+            if (!gen.SetItemSubtype("weapon", "sword", 3)) throw new Exception("Failed to set item subtype");
+            if (!gen.SetItemSubtype("weapon", "axe", 2)) throw new Exception("Failed to set item subtype");
+            if (!gen.SetItemSubtype("armor", "chest", 1)) throw new Exception("Failed to set item subtype");
             Console.WriteLine("✓ Item subtypes set");
 
             Console.WriteLine("Setting attributes...");
-            result = gen.SetAttribute("weapon", "", "damage", 15.0, 5.0, 30.0, true);
-            if (!result) throw new Exception("Failed to set attribute");
-            result = gen.SetAttribute("armor", "", "defense", 10.0, 2.0, 20.0, true);
-            if (!result) throw new Exception("Failed to set attribute");
+            if (!gen.SetAttribute("weapon", "", "damage", 15.0, 5.0, 30.0, true)) throw new Exception("Failed to set attribute");
+            if (!gen.SetAttribute("armor", "", "defense", 10.0, 2.0, 20.0, true)) throw new Exception("Failed to set attribute");
             Console.WriteLine("✓ Attributes set");
 
             Console.WriteLine("Setting item names...");
-            result = gen.SetItemNames("weapon", "sword", new[] { "longsword", "shortsword" });
-            if (!result) throw new Exception("Failed to set item names");
-            result = gen.SetItemNames("weapon", "axe", new[] { "battleaxe" });
-            if (!result) throw new Exception("Failed to set item names");
-            result = gen.SetItemNames("armor", "chest", new[] { "plate_armor", "leather_armor" });
-            if (!result) throw new Exception("Failed to set item names");
+            if (!gen.SetItemNames("weapon", "sword", new[] { "longsword", "shortsword" })) throw new Exception("Failed to set item names");
+            if (!gen.SetItemNames("weapon", "axe", new[] { "battleaxe" })) throw new Exception("Failed to set item names");
+            if (!gen.SetItemNames("armor", "chest", new[] { "plate_armor", "leather_armor" })) throw new Exception("Failed to set item names");
             Console.WriteLine("✓ Item names set\n");
 
             // Test 2: Query Methods
             Console.WriteLine("--- Test 2: Query Methods ---");
-
-            string qualityJson = gen.GetQualityData();
-            var qualities = JsonDocument.Parse(qualityJson);
-            Console.WriteLine("Quality data: " + qualityJson);
-            Console.WriteLine();
 
             bool hasCommon = gen.HasQuality("common");
             Console.WriteLine("Has quality 'common': " + hasCommon);
@@ -85,30 +66,20 @@ class Program {
             };
 
             Console.WriteLine("Generating 5 items...");
-            string itemsJson = PraedaHelper.GenerateLoot(gen, options);
-            var items = JsonDocument.Parse(itemsJson);
+            var items = gen.GenerateLoot(options);
 
-            Console.WriteLine("✓ Generated " + items.RootElement.GetArrayLength() + " items:");
+            Console.WriteLine("✓ Generated " + items.Count + " items:");
             int itemIndex = 1;
-            foreach (var item in items.RootElement.EnumerateArray()) {
-                string quality = item.GetProperty("quality").GetString();
-                string type = item.GetProperty("type").GetString();
-                string subtype = item.GetProperty("subtype").GetString();
-                string name = item.GetProperty("name").GetString();
-
-                Console.WriteLine($"  {itemIndex}. [{quality}] {type} / {subtype} - {name}");
+            foreach (var item in items) {
+                Console.WriteLine($"  {itemIndex}. [{item.Quality}] {item.Type} / {item.Subtype} - {item.Name}");
                 itemIndex++;
             }
             Console.WriteLine();
 
             // Test 4: Generator Info
             Console.WriteLine("--- Test 4: Generator Info ---");
-            string infoJson = gen.GetInfo();
-            var info = JsonDocument.Parse(infoJson);
-            Console.WriteLine("Generator info:");
-            Console.WriteLine("  Version: " + info.RootElement.GetProperty("version").GetString());
-            Console.WriteLine("  Qualities: " + info.RootElement.GetProperty("qualities").GetInt32());
-            Console.WriteLine("  Item types: " + info.RootElement.GetProperty("item_types").GetInt32());
+            string info = gen.GetInfo();
+            Console.WriteLine("Generator info retrieved (raw format): " + info.Substring(0, Math.Min(50, info.Length)) + "...");
             Console.WriteLine();
 
             Console.WriteLine("=== All Tests Passed! ===");
