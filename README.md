@@ -1,6 +1,6 @@
 # Praeda
 
-This library provides a flexible system for randomly generating items with affixes, attributes, and quality tiers.
+This library provides a flexible system for randomly generating items/loot with affixes, attributes, and quality tiers.
 
 ## Quick Start
 
