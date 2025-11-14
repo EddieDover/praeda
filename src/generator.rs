@@ -456,7 +456,7 @@ impl PraedaGenerator {
         options: &GeneratorOptions,
         overrides: &GeneratorOverrides,
     ) -> Result<Item> {
-        let mut rng = rand::thread_rng();
+        let mut rng = rand::rng();
 
         // Select quality
         let item_quality = if !overrides.quality_override.is_empty() {
@@ -497,15 +497,15 @@ impl PraedaGenerator {
             if names.is_empty() {
                 subtype.clone()
             } else {
-                names[rng.gen_range(0..names.len())].clone()
+                names[rng.random_range(0..names.len())].clone()
             }
         } else {
             subtype.clone()
         };
 
         // Determine if item will have prefix/suffix
-        let will_have_prefix = rng.gen::<f64>() < options.affix_chance;
-        let will_have_suffix = rng.gen::<f64>() < options.affix_chance;
+        let will_have_prefix = rng.random::<f64>() < options.affix_chance;
+        let will_have_suffix = rng.random::<f64>() < options.affix_chance;
 
         let mut prefix = Affix::empty();
         let mut suffix = Affix::empty();
@@ -533,11 +533,11 @@ impl PraedaGenerator {
             }
 
             if will_have_prefix && !valid_prefixes.is_empty() {
-                prefix = valid_prefixes[rng.gen_range(0..valid_prefixes.len())].clone();
+                prefix = valid_prefixes[rng.random_range(0..valid_prefixes.len())].clone();
             }
 
             if will_have_suffix && !valid_suffixes.is_empty() {
-                suffix = valid_suffixes[rng.gen_range(0..valid_suffixes.len())].clone();
+                suffix = valid_suffixes[rng.random_range(0..valid_suffixes.len())].clone();
             }
         }
 
@@ -578,7 +578,7 @@ impl PraedaGenerator {
     ) -> Result<()> {
         // Generate item level
         let level_range = options.level_variance;
-        let generated_level = rng.gen_range(
+        let generated_level = rng.random_range(
             (options.base_level - level_range) as i32..=(options.base_level + level_range) as i32,
         ) as f64;
 
@@ -634,7 +634,7 @@ impl PraedaGenerator {
         #[cfg(not(tarpaulin_include))]
         {
             for attr in optional_attributes {
-                if rng.gen::<f64>() <= options.affix_chance {
+                if rng.random::<f64>() <= options.affix_chance {
                     let mut final_attr = if let Some(existing) = item.get_attribute(&attr.name) {
                         let mut new_attr = existing.clone();
                         new_attr.initial_value += attr.initial_value;
@@ -712,7 +712,7 @@ impl PraedaGenerator {
         }
 
         let total_weight: i32 = weights.values().sum();
-        let mut roll = rng.gen_range(0..total_weight);
+        let mut roll = rng.random_range(0..total_weight);
 
         // Sort keys to ensure deterministic iteration order
         let mut sorted_keys: Vec<_> = weights.keys().collect();
