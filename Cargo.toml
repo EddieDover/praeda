@@ -11,7 +11,6 @@ homepage = "https://github.com/EddieDover/praeda"
 readme = "README.md"
 keywords = ["loot", "procedural", "generation", "game", "items"]
 categories = ["game-development", "no-std"]
-publish = false
 
 [lib]
 crate-type = ["rlib", "cdylib"]
