@@ -1,6 +1,6 @@
 # Praeda
 
-A procedural loot generator library written in Rust with FFI bindings for C++ and C#.
+A procedural loot generator library written in Rust with FFI bindings (and examples) for C++, C#, and the [Godot Engine](https://godotengine.org/) v4.2+.
 
 ## Features
 
@@ -228,6 +228,10 @@ class Program {
 }
 ```
 
+### Godot
+
+See `examples/godot`.
+
 ## Building
 
 ### Rust Library
@@ -253,6 +257,11 @@ cd examples/csharp
 dotnet build
 dotnet run
 ```
+
+
+### Godot Examples
+
+The Godot binding crate is built when the primary rust library is built. See `examples/godot/README.md`.
 
 ## License
 
