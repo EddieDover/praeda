@@ -1,12 +1,12 @@
 [alias]
 # Full coverage report with HTML and XML output
-coverage = "tarpaulin --all-features --timeout 120 --out html --out xml --output-dir coverage"
+coverage = "tarpaulin --workspace --all-features --timeout 120 --out html --out xml --output-dir coverage --exclude praeda-godot"
 
 # Quick coverage check (just show percentage)
-coverage-check = "tarpaulin --all-features --timeout 120 --exclude-files src/error.rs"
+coverage-check = "tarpaulin --workspace --all-features --timeout 120 --exclude-files src/error.rs --exclude praeda-godot"
 
 # Coverage with lcov output
-coverage-lcov = "tarpaulin --all-features --timeout 120 --out lcov"
+coverage-lcov = "tarpaulin --workspace --all-features --timeout 120 --out lcov --exclude praeda-godot"
 
 # Strict Clippy check
-strict = "clippy --all-targets --all-features -- -D warnings"
+strict = "clippy --workspace --all-targets --all-features --exclude praeda-godot -- -D warnings"

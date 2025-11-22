@@ -1,6 +1,10 @@
+[workspace]
+members = ["bindings/praeda-godot"]
+default-members = [".", "bindings/praeda-godot"]
+
 [package]
 name = "praeda"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 license = "LGPL-3.0-or-later"
 description = "A procedural loot generator library with C++ and C# FFI bindings"
@@ -11,6 +15,7 @@ homepage = "https://github.com/EddieDover/praeda"
 readme = "README.md"
 keywords = ["loot", "procedural", "generation", "game", "items"]
 categories = ["game-development", "no-std"]
+exclude = ["bindings", "examples", "scripts"]
 
 [lib]
 crate-type = ["rlib", "cdylib"]

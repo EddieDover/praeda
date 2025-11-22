@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://b8p2q4q4q4q4"]
+
+[ext_resource type="Script" uid="uid://dav6skbwq8xcl" path="res://test_praeda.gd" id="1_script"]
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1_script")

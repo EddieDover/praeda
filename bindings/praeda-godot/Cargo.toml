@@ -1,0 +1,12 @@
+[package]
+name = "praeda-godot"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+godot = { version = "0.2", features = ["experimental-wasm"] } # Using 0.2 for Godot 4.x support
+praeda = { path = "../../" }
