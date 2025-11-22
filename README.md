@@ -230,7 +230,39 @@ class Program {
 
 ### Godot
 
-See `examples/godot`.
+See `examples/godot` for a full project example.
+
+```gdscript
+func _ready():
+    var generator = PraedaGodotGenerator.new()
+
+    # Define quality tiers
+    generator.set_quality_data("Common", 100)
+    generator.set_quality_data("Rare", 30)
+
+    # Define item types
+    generator.set_item_type("Weapon", 1)
+    generator.set_item_subtype("Weapon", "Sword", 1)
+    generator.set_item_names("Weapon", "Sword", ["Longsword", "Shortsword"])
+
+    # Define attributes
+    generator.set_attribute("Weapon", "", "Damage", 10.0, 5.0, 20.0, true)
+
+    # Generate loot
+    var options = {
+        "number_of_items": 5,
+        "base_level": 15.0,
+        "level_variance": 5.0,
+        "affix_chance": 0.75,
+        "linear": true,
+        "scaling_factor": 1.0
+    }
+
+    var items = generator.generate_loot(options, {}, "Loot")
+    
+    for item in items:
+        print("%s: %s" % [item.quality, item.name])
+```
 
 ## Building
 

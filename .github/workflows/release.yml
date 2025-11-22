@@ -1,0 +1,94 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-release-assets:
+    name: Build Release Assets
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            godot_artifact: libpraeda_godot.so
+            godot_asset: praeda-godot-linux-x86_64.so
+            core_artifact: libpraeda.so
+            cpp_asset: praeda-cpp-linux-x86_64.zip
+            csharp_asset: praeda-csharp-linux-x86_64.zip
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            godot_artifact: praeda_godot.dll
+            godot_asset: praeda-godot-windows-x86_64.dll
+            core_artifact: praeda.dll
+            cpp_asset: praeda-cpp-windows-x86_64.zip
+            csharp_asset: praeda-csharp-windows-x86_64.zip
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            godot_artifact: libpraeda_godot.dylib
+            godot_asset: praeda-godot-macos-arm64.dylib
+            core_artifact: libpraeda.dylib
+            cpp_asset: praeda-cpp-macos-arm64.zip
+            csharp_asset: praeda-csharp-macos-arm64.zip
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Build Godot Bindings
+        run: cargo build --release -p praeda-godot --target ${{ matrix.target }}
+
+      - name: Build Core Library
+        run: cargo build --release -p praeda --target ${{ matrix.target }}
+
+      - name: Prepare Godot Asset
+        shell: bash
+        run: |
+          cp target/${{ matrix.target }}/release/${{ matrix.godot_artifact }} ${{ matrix.godot_asset }}
+
+      - name: Prepare C++ Asset
+        shell: bash
+        run: |
+          mkdir -p cpp_dist/include
+          mkdir -p cpp_dist/lib
+          cp include/praeda.hpp cpp_dist/include/
+          cp target/${{ matrix.target }}/release/${{ matrix.core_artifact }} cpp_dist/lib/
+          
+          if [ "${{ runner.os }}" == "Windows" ]; then
+            7z a ${{ matrix.cpp_asset }} ./cpp_dist/*
+          else
+            zip -r ${{ matrix.cpp_asset }} cpp_dist
+          fi
+
+      - name: Prepare C# Asset
+        shell: bash
+        run: |
+          mkdir -p csharp_dist/src
+          mkdir -p csharp_dist/lib
+          cp examples/csharp/PraedaGenerator.cs csharp_dist/src/
+          cp target/${{ matrix.target }}/release/${{ matrix.core_artifact }} csharp_dist/lib/
+          
+          if [ "${{ runner.os }}" == "Windows" ]; then
+            7z a ${{ matrix.csharp_asset }} ./csharp_dist/*
+          else
+            zip -r ${{ matrix.csharp_asset }} csharp_dist
+          fi
+
+      - name: Upload Release Assets
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            ${{ matrix.godot_asset }}
+            ${{ matrix.cpp_asset }}
+            ${{ matrix.csharp_asset }}

@@ -188,6 +188,8 @@ cargo strict
 
 ```
 praeda/
+├── bindings/                      # Language bindings
+│   └── praeda-godot/              # Godot 4.x GDExtension bindings
 ├── src/                           # Library source code
 │   ├── lib.rs                     # Library entry point
 │   ├── models.rs                  # Data structures (Item, ItemAttribute, Affix, etc.)
@@ -204,9 +206,13 @@ praeda/
 │   │   ├── README.md
 │   │   ├── CMakeLists.txt
 │   │   └── test_praeda.cpp
-│   └── csharp/                    # C# FFI examples
-│       ├── README.md
-│       └── Praeda.cs
+│   ├── csharp/                    # C# FFI examples
+│   │   ├── README.md
+│   │   ├── PraedaGenerator.cs
+│   │   └── PraedaTest.cs
+│   └── godot/                     # Godot 4.x example project
+│       ├── project.godot
+│       └── test_praeda.gd
 ├── .github/workflows/             # CI/CD pipelines
 │   ├── rust.yml                   # Rust build, test, and coverage
 │   ├── build-libraries.yml        # FFI library builds for C++ and C#
