@@ -3,17 +3,14 @@ changelog_config = "cliff.toml"
 allow_dirty = false
 repo_url = "https://github.com/EddieDover/praeda"
 
-# Configuration for the main library
-[package.praeda]
+[[package]]
+name = "praeda"
 release = true
 changelog_update = true
 git_tag_enable = true
 
-# Configuration for the Godot bindings
-[package.praeda-godot]
-# We don't publish this to crates.io
-release = false 
-# We still want to bump the version in Cargo.toml when dependencies change
+[[package]]
+name = "praeda-godot"
+release = false
 changelog_update = true
-# We don't need a separate git tag for this, the repo tag covers it
 git_tag_enable = false
