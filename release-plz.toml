@@ -11,6 +11,6 @@ git_tag_enable = true
 
 [[package]]
 name = "praeda-godot"
-release = false
+publish = false
 changelog_update = true
 git_tag_enable = false
